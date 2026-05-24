@@ -83,12 +83,13 @@ com.example.bookstore/
 ## Modified Chapter Roadmap
 
 ### Phase 1: Core Spring Context & DI (Ch 1–5)
-**Status:** In Progress
-- [x] `BookRepository` interface and `MockBookRepository` implementation
-- [x] `BookCatalogProxy` interface (replaces book's `DeliveryNotificationProxy`)
-- [ ] `ExternalBookCatalogProxy` implementation (logs to console/mock URL for now)
-- [ ] `BookService` with constructor injection (`@Service`) — catalog operations only
-- [ ] Scoped bean: `BookImportProcessor` with `@Scope(PROTOTYPE)` (mutable state per import job)
+**Status:** ✅ COMPLETE
+- [x] `BookRepository` interface and `BookMockRepository` implementation
+- [x] `BookImageFetch` proxy (concrete class with `@Component`)
+- [x] `BookService` with constructor injection (`@Service`) — catalog operations only
+- [x] `BookStartupTest` (`CommandLineRunner`) to verify Spring context wiring
+- [ ] `BookCatalogProxy` interface (refactor later when switching to real Feign call)
+- [ ] Scoped bean: `BookImportProcessor` with `@Scope(PROTOTYPE)` — **SKIPPED for now**
 - **Deviations from book:** E-commerce domain replaced with Goodreads catalog domain. No email proxy.
 
 ### Phase 2: AOP (Ch 6)
@@ -149,31 +150,29 @@ com.example.bookstore/
 
 ## Current Open Tasks
 
-1. **Refactor `MockRepository` → `book/repository/MockBookRepository.java`**
-   - Move to `book` package
-   - Rename class for clarity
-   - Implement `addBook` (auto-assign sequential ID if unset)
-   - Implement `getBook` (loop through list, match by ID)
+### Ch 1–5 Follow-up (Deferred / Optional)
+1. **Fix `BookMockRepository` bugs**
+   - `getBook(int id)`: search by `book.getId()` match, not `list.get(index)`
+   - `addBook(Book book)`: auto-assign sequential ID when `id == 0`
    - Add `getAllBooks()` for listing
 
-2. **Implement `BookCatalogProxy` and its mock implementation**
-   - Decide method: `String getCoverImageUrl(Long bookId)` or `BookMetadata fetchMetadata(String isbn)`
-   - Create `ExternalBookCatalogProxy` annotated with `@Component`
-   - For now, return a hardcoded/mock string or print to console
+2. **Refactor `BookImageFetch` into proper Proxy Pattern**
+   - Create `BookCatalogProxy` interface
+   - Make `BookImageFetch` implement it (or rename)
+   - Currently `BookService` depends on concrete class, not abstraction
 
-3. **Create `book/service/BookService.java`**
-   - Constructor injection: `BookRepository` + `BookCatalogProxy`
-   - Methods:
-     - `Book getBookById(int id)`
-     - `List<Book> getAllBooks()`
-     - `Book addBook(Book book)` — validates and delegates to repo
-     - `List<Book> findBooksByAuthor(String author)`
-   - No rating logic, no user logic — catalog only
+3. **Prototype-scoped bean**
+   - `BookImportProcessor` — **deferred until needed**
 
-4. **Create prototype-scoped bean**
-   - `BookImportProcessor` in `book/service` package
-   - Annotated with `@Scope(BeanDefinition.SCOPE_PROTOTYPE)`
-   - Holds mutable state: `int processedCount`, `int failedCount`
+### Next Chapter Tasks (Ch 6 — AOP)
+- Create `@LogExecutionTime` custom annotation
+- Create `@Aspect` class with `@Around` advice
+- Measure and log method execution time on `BookService`
+
+### Ch 7–8 (Spring Boot Web)
+- Add `spring-boot-starter-web` to `build.gradle.kts`
+- Convert to `@RestController` returning JSON
+- Add pagination from day one
 
 ---
 

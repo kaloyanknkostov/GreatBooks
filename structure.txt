@@ -1,0 +1,19 @@
+```
+   book/
+     model/Book.java
+     repository/BookRepository.java
+     repository/MockBookRepository.java
+     service/BookService.java
+     proxy/BookCatalogProxy.java          // what you called BookProxy
+     proxy/ExternalBookCatalogProxy.java  // implementation
+   user/
+     model/User.java
+     repository/UserRepository.java
+     service/UserService.java
+   rating/
+     model/Rating.java
+     repository/RatingRepository.java
+     service/RatingService.java
+   recommendation/
+     service/RecommendationService.java   // calls Python later
+ ```

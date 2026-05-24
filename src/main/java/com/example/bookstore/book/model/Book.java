@@ -1,4 +1,4 @@
-package com.example.bookstore.model;
+package com.example.bookstore.book.model;
 
 import lombok.Setter;
 import lombok.Getter;
@@ -10,13 +10,11 @@ public class Book {
     private String title;
     private String author;
     private double price;
-    private int quantityInStock;
 
-    public Book(String title, String author, double price){
+    public Book(int id, String title, String author, double price){
         this.id=0;
         this.title=title;
         this.author=author;
         this.price=price;
-        this.quantityInStock=0;
     }
 }
