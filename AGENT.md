@@ -164,10 +164,11 @@ com.example.bookstore/
 3. **Prototype-scoped bean**
    - `BookImportProcessor` — **deferred until needed**
 
-### Next Chapter Tasks (Ch 6 — AOP)
-- Create `@LogExecutionTime` custom annotation
-- Create `@Aspect` class with `@Around` advice
-- Measure and log method execution time on `BookService`
+### Phase 2: AOP — Logging with Aspects (Ch 6)
+**Status:** In Progress
+- [ ] Create custom `@LogExecutionTime` annotation
+- [ ] Create `@Aspect` class with `@Around` advice
+- [ ] Intercept `BookService` methods, measure execution time, print to console
 
 ### Ch 7–8 (Spring Boot Web)
 - Add `spring-boot-starter-web` to `build.gradle.kts`

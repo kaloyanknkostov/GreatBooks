@@ -1,10 +1,12 @@
 package com.example.bookstore.book.service;
 
 import com.example.bookstore.book.model.Book;
+import com.example.bookstore.book.model.Tag;
 import com.example.bookstore.book.proxy.BookImageFetch;
 import com.example.bookstore.book.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -18,7 +20,9 @@ public class BookService {
     }
 
     public void createBook(int id,String title, String author, double price){
-       Book temp= new Book(id,title,author,price);
+       //TODO create tags repo import here and find the correct tags and fill the list
+       var tags = new ArrayList<Tag>();
+       Book temp= new Book(id,title,author,price,tags);
        fetcher.testCalled();
        repo.addBook(temp);
     }
