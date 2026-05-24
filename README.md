@@ -1,83 +1,59 @@
 # GoodBooks
 
-A production-style **Goodreads-inspired book platform** built as a stateless Spring Boot REST API. The backend serves JSON only — a separate JavaScript frontend and Python recommendation microservice are planned for later.
+**Discover, rate, and get personalized book recommendations** — a Goodreads-inspired platform built as a modern, stateless REST API.
 
-> Learning project following [*Spring Start Here*](https://www.manning.com/books/spring-start-here) by Laurențiu Spilcă, adapted from an e-commerce tutorial into a book catalog and ratings domain.
+GoodBooks is a full-stack book community backend: browse a catalog of thousands of titles, track what you read, leave ratings and reviews, and receive recommendations tailored to your taste. The API is designed for a separate web client and scales horizontally with no server-side sessions.
 
-## Tech Stack
+---
 
-| Layer | Technology |
-|-------|------------|
-| Language | Java 21 |
-| Framework | Spring Boot 4.0.6 |
-| Build | Gradle (Kotlin DSL) |
-| Persistence (planned) | PostgreSQL + Spring Data JPA |
-| Boilerplate | Lombok |
-| Recommendations (planned) | Python microservice via OpenFeign |
-| Frontend (planned) | JavaScript (separate repo) |
+## What you get
+
+| Capability | Description |
+|------------|-------------|
+| **Book catalog** | Search and browse books with pagination, tags, and cover art from external sources |
+| **Ratings & reviews** | Users rate books; aggregate scores stay consistent under concurrent updates |
+| **Personal shelves** | Reading lists and activity without tying state to a single server instance |
+| **Smart recommendations** | Content-based and collaborative filtering via a dedicated Python service |
+| **Production-ready data** | PostgreSQL backed by the [goodbooks-10k](https://github.com/zygmuntz/goodbooks-10k) dataset (~10k books, ~6M ratings) |
+
+---
 
 ## Architecture
 
 ```
 ┌─────────────┐     JSON/REST      ┌──────────────────┐
-│  JS Client  │ ◄────────────────► │  Spring Boot API │
+│  Web client │ ◄────────────────► │  Spring Boot API │
+│  (planned)  │                    │     (GoodBooks)  │
 └─────────────┘                    └────────┬─────────┘
                                             │
                          ┌──────────────────┼──────────────────┐
                          ▼                  ▼                  ▼
-                   PostgreSQL      Open Library /        Python Rec
-                   (goodbooks10k)   cover images          microservice
+                   PostgreSQL        Open Library /        Python
+                   (goodbooks10k)     cover images         recommendations
 ```
 
-### Design decisions
+- **Stateless API** — JSON only; no Thymeleaf or server sessions  
+- **Domain-driven packages** — `book`, `user`, `rating`, `recommendation`  
+- **Clear boundaries** — external catalog and images behind proxies; core domains stay internal  
 
-- **Stateless API** — no server-side sessions; horizontally scalable
-- **No Thymeleaf** — JSON-only responses for a separate frontend
-- **PostgreSQL from day one** — production parity, no H2 migration later
-- **Domain-per-package layout** — `book/`, `user/`, `rating/`, `recommendation/`
-- **Proxy pattern only where needed** — external book metadata and images (`BookImageFetch`); user/rating domains stay internal
+---
 
-## Project Structure
+## Tech stack
 
-```
-com.example.bookstore/
-├── book/
-│   ├── model/          Book, Tag
-│   ├── repository/     BookRepository, BookMockRepository
-│   ├── service/        BookService
-│   └── proxy/          BookImageFetch (external metadata/images)
-├── user/
-│   └── model/          User
-├── rating/             (planned)
-└── recommendation/     (planned)
-```
+| | |
+|---|---|
+| **Runtime** | Java 21 |
+| **Framework** | Spring Boot 4 |
+| **Build** | Gradle (Kotlin DSL) |
+| **Database** | PostgreSQL + Spring Data JPA |
+| **Recommendations** | Python microservice (OpenFeign) |
+| **Frontend** | JavaScript SPA (separate repository, planned) |
 
-## Current Status
+---
 
-**Phase 1 — Core Spring Context & DI** ✅
+## Quick start
 
-- [x] Spring Boot project with Gradle Kotlin DSL and Java 21 toolchain
-- [x] Lombok configured with annotation processing
-- [x] `Book` domain model with tags
-- [x] `BookRepository` interface + in-memory `BookMockRepository`
-- [x] `BookService` with constructor injection
-- [x] `BookImageFetch` proxy component for external catalog integration
-- [x] `BookStartupTest` (`CommandLineRunner`) to verify Spring context wiring
-
-**In progress**
-
-- [ ] AOP execution-time logging (`@LogExecutionTime`, `@Aspect`)
-- [ ] REST endpoints (`GET /api/books`, `POST /api/books`) with pagination
-- [ ] Refactor `BookImageFetch` behind a `BookCatalogProxy` interface
-
-## Getting Started
-
-### Prerequisites
-
-- JDK 21
-- Git
-
-### Run locally
+**Requirements:** JDK 21, Git
 
 ```bash
 git clone git@github.com:kaloyanknkostov/GoodBooks.git
@@ -85,34 +61,30 @@ cd GoodBooks
 ./gradlew bootRun
 ```
 
-On startup, `BookStartupTest` seeds a sample book and prints context wiring output to the console.
-
-### Run tests
+On startup, the app seeds a sample book and logs context wiring so you can confirm everything loaded.
 
 ```bash
 ./gradlew test
 ```
 
-## Roadmap
+REST endpoints and the database layer are on the roadmap — see [PLAN.md](PLAN.md) for the full development plan and current progress.
 
-| Phase | Focus |
-|-------|-------|
-| 1 | Spring DI, repositories, services ✅ |
-| 2 | AOP — method execution logging |
-| 3 | REST API with pagination |
-| 4 | Error handling (`@RestControllerAdvice`, domain exceptions) |
-| 5 | OpenFeign → Python recommendation service |
-| 6 | PostgreSQL + JPA, [goodbooks-10k](https://github.com/zygmuntz/goodbooks-10k) dataset |
-| 7 | Transactions — atomic rating updates with derived fields |
-| 8 | JUnit 5, Mockito, `@SpringBootTest`, MockMvc |
-| 9 | Recommendation tiers — content-based + optional collaborative filtering |
+---
 
-## Dataset
+## Project status
 
-The production database will use the **[goodbooks-10k](https://github.com/zygmuntz/goodbooks-10k)** dataset (~10,000 books, ~6M ratings). List endpoints will support pagination from the start.
+Early development: Spring context, domain models, repositories, and services are in place. Next up: AOP logging, REST API with pagination, PostgreSQL, and the recommendation service.
 
-## Resources
+For architecture decisions, phased roadmap, and task checklists, see **[PLAN.md](PLAN.md)**.
 
-- [Spring Start Here](https://www.manning.com/books/spring-start-here) — Laurențiu Spilcă
-- [Spring Boot 4.0 docs](https://docs.spring.io/spring-boot/)
+---
+
+## Learning context
+
+This project follows [*Spring Start Here*](https://www.manning.com/books/spring-start-here) by Laurențiu Spilcă, adapted from an e-commerce tutorial into a book catalog and ratings domain.
+
+## Links
+
+- [Development plan & roadmap](PLAN.md)
 - [goodbooks-10k dataset](https://github.com/zygmuntz/goodbooks-10k)
+- [Spring Boot documentation](https://docs.spring.io/spring-boot/)
