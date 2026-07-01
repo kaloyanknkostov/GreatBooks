@@ -14,7 +14,7 @@ GoodBooks is a full-stack book community backend: browse a catalog of thousands 
 | **Ratings & reviews** | Users rate books; aggregate scores stay consistent under concurrent updates |
 | **Personal shelves** | Reading lists and activity without tying state to a single server instance |
 | **Smart recommendations** | Content-based and collaborative filtering via a dedicated Python service |
-| **Production-ready data** | PostgreSQL backed by the [goodbooks-10k](https://github.com/zygmuntz/goodbooks-10k) dataset (~10k books, ~6M ratings) |
+| **Production-ready data** | PostgreSQL backed by the [goodbooks-10k-extended](https://github.com/malcolmosh/goodbooks-10k-extended) dataset (~10k books, ~6M ratings, enriched metadata) |
 
 ---
 
@@ -83,8 +83,14 @@ For architecture decisions, phased roadmap, and task checklists, see **[PLAN.md]
 
 This project follows [*Spring Start Here*](https://www.manning.com/books/spring-start-here) by Laurențiu Spilcă, adapted from an e-commerce tutorial into a book catalog and ratings domain.
 
+## Data credits
+
+Book catalog and ratings data are sourced from open datasets on GitHub:
+
+- **[goodbooks-10k-extended](https://github.com/malcolmosh/goodbooks-10k-extended)** — extended book metadata (descriptions, page counts, publication dates, genres) by Malcolm Osh
+- **[goodbooks-10k](https://github.com/zygmuntz/goodbooks-10k)** — original Goodreads ratings and catalog (~10k books, ~6M ratings) by Zygmunt Zając
+
 ## Links
 
 - [Development plan & roadmap](PLAN.md)
-- [goodbooks-10k dataset](https://github.com/zygmuntz/goodbooks-10k)
 - [Spring Boot documentation](https://docs.spring.io/spring-boot/)
