@@ -14,19 +14,44 @@ java {
     }
 }
 
+sourceSets {
+    create("scripts") {
+    }
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
-    implementation("org.springframework.boot:spring-boot-starter-aop")
+   // implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-flyway")
+    runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-jdbc-test")
     testCompileOnly("org.projectlombok:lombok")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testAnnotationProcessor("org.projectlombok:lombok")
+
+    "scriptsImplementation"("org.springframework.boot:spring-boot-starter-jdbc")
+    "scriptsRuntimeOnly"("org.postgresql:postgresql")
+}
+
+tasks.register<JavaExec>("runScript") {
+    group = "application"
+    description = "Run a class from the scripts source set"
+
+    classpath = sourceSets["scripts"].runtimeClasspath
+    mainClass.set(project.findProperty("scriptClass") as String? ?: "com.example.TestingDbConnection")
+    standardInput = System.`in`
+
+    if (project.hasProperty("scriptArgs")) {
+        args((project.property("scriptArgs") as String).split(" "))
+    }
 }
 
 tasks.withType<Test> {

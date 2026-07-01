@@ -1,14 +1,14 @@
 package com.example.bookstore.book.repository;
-import com.example.bookstore.book.model.Book;
 
-import org.springframework.stereotype.Repository;
+import com.example.bookstore.book.model.Book;
 import java.util.ArrayList;
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
 @Repository
-public class BookMockRepository implements BookRepository{
-    private final ArrayList<Book> list= new ArrayList<Book>() ;
+public class BookMockRepository implements BookRepository {
 
+    private final ArrayList<Book> list = new ArrayList<Book>();
 
     @Override
     public void addBook(Book book) {
@@ -17,7 +17,9 @@ public class BookMockRepository implements BookRepository{
 
     @Override
     public Optional<Book> getBook(int id) {
-       return list.stream()
-                .filter(book -> book.getId() == id).findFirst();
+        return list
+            .stream()
+            .filter(book -> book.getId() == id)
+            .findFirst();
     }
 }
