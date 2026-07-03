@@ -32,11 +32,6 @@ public class ProjectConfig {
     }
 
     @Bean
-    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-        return new JdbcTemplate(dataSource);
-    }
-
-    @Bean
     public NamedParameterJdbcTemplate namedParameterJdbcTemplate(
         DataSource dataSource
     ) {
@@ -50,9 +45,8 @@ public class ProjectConfig {
 
     @Bean
     public BookInsertion bookInsertion(
-        JdbcTemplate jdbcTemplate,
         NamedParameterJdbcTemplate namedParameterJdbcTemplate
     ) {
-        return new BookInsertion(jdbcTemplate, namedParameterJdbcTemplate);
+        return new BookInsertion(namedParameterJdbcTemplate);
     }
 }
