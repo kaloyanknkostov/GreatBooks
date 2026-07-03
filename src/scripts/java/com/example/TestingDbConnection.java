@@ -9,8 +9,15 @@ public class TestingDbConnection {
     /*
     gradlew runScript -PscriptClass=com.example.OtherScript
     */
-
     public static void main(String[] args) {
+        var app = new SpringApplication(ProjectConfig.class);
+        app.setWebApplicationType(WebApplicationType.NONE);
+        var context = app.run(args);
+        context.getBean(BookInsertion.class).runner();
+        context.close();
+    }
+
+    public static void main1(String[] args) {
         var app = new SpringApplication(ProjectConfig.class);
         app.setWebApplicationType(WebApplicationType.NONE);
         var context = app.run(args);

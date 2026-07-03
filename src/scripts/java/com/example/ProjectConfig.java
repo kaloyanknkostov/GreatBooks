@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Configuration
 public class ProjectConfig {
@@ -36,7 +37,22 @@ public class ProjectConfig {
     }
 
     @Bean
+    public NamedParameterJdbcTemplate namedParameterJdbcTemplate(
+        DataSource dataSource
+    ) {
+        return new NamedParameterJdbcTemplate(dataSource);
+    }
+
+    @Bean
     public DbConnector dbConnector(JdbcTemplate jdbcTemplate) {
         return new DbConnector(jdbcTemplate);
+    }
+
+    @Bean
+    public BookInsertion bookInsertion(
+        JdbcTemplate jdbcTemplate,
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate
+    ) {
+        return new BookInsertion(jdbcTemplate, namedParameterJdbcTemplate);
     }
 }
