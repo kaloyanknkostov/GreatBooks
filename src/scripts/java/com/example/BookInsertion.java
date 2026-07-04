@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -35,9 +36,16 @@ for date
    16 │    }
    17 │}
 */
-    private final NamedParameterJdbcTemplate namedjdbc;
+    final NamedParameterJdbcTemplate namedjdbc;
+    final File booksCSV = new File(
+        "data/goodbooks-10k-extended/books_enriched.csv"
+    );
+    final File samplebooksCSV = new File(
+        "data/goodbooks-10k-extended/sample.csv"
+    );
     private static final String sql = """
               INSERT INTO books(
+                                 id                       ,
                                  average_rating           ,   -- float
                                  best_book_id             ,
                                  book_id                  ,
@@ -62,6 +70,7 @@ for date
                                  work_text_reviews_count
           )
           Values(
+                                 :id                       ,
                                  :average_rating           ,   -- float
                                  :best_book_id             ,
                                  :book_id                  ,
@@ -94,28 +103,26 @@ for date
     }
 
     public void runner() {
-        var booksCSV = new File(
-            "data/goodbooks-10k-extended/books_enriched.csv"
-        );
-        // sample
-        //booksCSV = new File("data/goodbooks-10k-extended/sample.csv");
-        try (CSVReader reader = new CSVReader(new FileReader(booksCSV))) {
+        try (CSVReader reader = new CSVReader(new FileReader(samplebooksCSV))) {
             String[] nextRecord;
-            String[] header = reader.readNext();
+            var header = reader.readNext();
             if (header == null) {
                 System.out.println("Empty file");
                 return;
             }
-            var counter = 0;
+            System.out.println("INN");
+            System.out.println(Arrays.toString(header));
+            var counter = 1;
             while ((nextRecord = reader.readNext()) != null) {
                 if (header.length != nextRecord.length) {
                     System.out.println("Wrong lenght at item " + counter);
                     return;
                 }
-                var params = mapToSqlParams(
-                    currentLineToMap(header, nextRecord)
-                );
+                var line = currentLineToMap(header, nextRecord);
+                var params = mapToSqlParams(line);
+                params.addValue("id", counter);
                 namedjdbc.update(sql, params);
+                handleAuthors(counter, line.get("authors"));
                 counter++;
             }
             reader.close();
@@ -131,45 +138,67 @@ for date
         }
     }
 
+    private void handleAuthors(int book_id, String authors) {
+        // parse the authors to a single string
+        var author = getAuthor(authors);
+        if (author.equals("")) {
+            return;
+        }
+        System.out.println(author);
+        // getAuthor
+        //create author in authors table
+        //link author to book in merged table
+    }
+
+    private String getAuthor(String authors) {
+        var sb = new StringBuilder();
+        for (char c : authors.substring(2).toCharArray()) {
+            if (sb.isEmpty() && c == '\'') {
+                return "";
+            }
+            if (c == '\'') {
+                break;
+            }
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
     private MapSqlParameterSource mapToSqlParams(Map<String, String> row) {
-        return new MapSqlParameterSource()
-            .addValue(
-                "average_rating",
-                parseFloatsSafe(row.get("average_rating"))
-            )
-            .addValue("best_book_id", Integer.parseInt(row.get("best_book_id")))
-            .addValue("book_id", Integer.parseInt(row.get("book_id")))
-            .addValue("books_count", Integer.parseInt(row.get("books_count")))
-            .addValue("description", row.get("description"))
-            .addValue("genres", row.get("genres"))
-            .addValue(
-                "goodreads_book_id",
-                Integer.parseInt(row.get("goodreads_book_id"))
-            )
-            .addValue("image_url", row.get("image_url"))
-            .addValue("isbn13", parseFloatsSafe(row.get("isbn13")))
-            .addValue("language_code", row.get("language_code"))
-            .addValue("pages", parseFloatsSafe(row.get("pages")))
-            //.addValue("publishDate", row.get("publishDate"))
-            .addValue("ratings_1", Integer.parseInt(row.get("ratings_1")))
-            .addValue("ratings_2", Integer.parseInt(row.get("ratings_2")))
-            .addValue("ratings_3", Integer.parseInt(row.get("ratings_3")))
-            .addValue("ratings_4", Integer.parseInt(row.get("ratings_4")))
-            .addValue("ratings_5", Integer.parseInt(row.get("ratings_5")))
-            .addValue(
-                "ratings_count",
-                Integer.parseInt(row.get("ratings_count"))
-            )
-            .addValue("title", row.get("title"))
-            .addValue("work_id", Integer.parseInt(row.get("work_id")))
-            .addValue(
-                "work_ratings_count",
-                Integer.parseInt(row.get("work_ratings_count"))
-            )
-            .addValue(
-                "work_text_reviews_count",
-                Integer.parseInt(row.get("work_text_reviews_count"))
-            );
+        var params = new MapSqlParameterSource();
+        for (String header : row.keySet()) {
+            switch (header) {
+                //ignore
+                case
+                    "",
+                    "authors_2",
+                    "isbn",
+                    "authors",
+                    "original_publication_year",
+                    "original_title",
+                    "small_image_url" -> {
+                }
+                // float
+                case "average_rating", "isbn13", "pages" -> params.addValue(
+                    header,
+                    parseFloatsSafe(row.get(header))
+                );
+                // raw String
+                case
+                    "description",
+                    "image_url",
+                    "language_code",
+                    "publishDate",
+                    "title",
+                    "genres" -> params.addValue(header, row.get(header));
+                // int
+                default -> params.addValue(
+                    header,
+                    Integer.parseInt(row.get(header))
+                );
+            }
+        }
+        return params;
     }
 
     private Float parseFloatsSafe(String input) {
