@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 public class BookInsertion {
 
     /*
-TODO authors create new table authors and book authors
 
 for date
 1 │import java.time.LocalDate;
@@ -40,7 +40,7 @@ for date
     final File booksCSV = new File(
         "data/goodbooks-10k-extended/books_enriched.csv"
     );
-    final File samplebooksCSV = new File(
+    final File sampleBooksCSV = new File(
         "data/goodbooks-10k-extended/sample.csv"
     );
     private static final String sql = """
@@ -95,6 +95,17 @@ for date
                                  :work_text_reviews_count
                     )
         """;
+    final String createAuthorSQL = """
+        INSERT INTO authors (name) VALUES (:name)
+        ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name
+        RETURNING id
+        """;
+
+    final String insertAuthorBook = """
+        INSERT INTO book_authors (book_id, author_id)
+        VALUES (:bookId, :authorId)
+        ON CONFLICT DO NOTHING;
+        """;
 
     public BookInsertion(
         NamedParameterJdbcTemplate namedParameterJdbcTemplate
@@ -103,15 +114,13 @@ for date
     }
 
     public void runner() {
-        try (CSVReader reader = new CSVReader(new FileReader(samplebooksCSV))) {
+        try (CSVReader reader = new CSVReader(new FileReader(booksCSV))) {
             String[] nextRecord;
             var header = reader.readNext();
             if (header == null) {
                 System.out.println("Empty file");
                 return;
             }
-            System.out.println("INN");
-            System.out.println(Arrays.toString(header));
             var counter = 1;
             while ((nextRecord = reader.readNext()) != null) {
                 if (header.length != nextRecord.length) {
@@ -138,16 +147,29 @@ for date
         }
     }
 
+    @Transactional
     private void handleAuthors(int book_id, String authors) {
-        // parse the authors to a single string
-        var author = getAuthor(authors);
-        if (author.equals("")) {
+        var authorName = getAuthor(authors);
+        if (authorName.equals("")) {
             return;
         }
-        System.out.println(author);
-        // getAuthor
-        //create author in authors table
-        //link author to book in merged table
+        var authorParams = new MapSqlParameterSource().addValue(
+            "name",
+            authorName
+        );
+        var authorId = namedjdbc.queryForObject(
+            createAuthorSQL,
+            authorParams,
+            Integer.class
+        );
+        if (authorId == null) {
+            throw new IllegalStateException("Failed to obtain author ID.");
+        }
+        var joinParams = new MapSqlParameterSource()
+            .addValue("bookId", book_id)
+            .addValue("authorId", authorId);
+
+        namedjdbc.update(insertAuthorBook, joinParams);
     }
 
     private String getAuthor(String authors) {
