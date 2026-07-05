@@ -1,0 +1,52 @@
+DROP TABLE users;
+DROP TABLE books CASCADE;
+DROP TABLE authors CASCADE;
+DROP TABLE book_authors;
+CREATE TABLE users (
+                       id SERIAL PRIMARY KEY NOT NULL,
+                       username VARCHAR(100) UNIQUE NOT NULL,
+                       email VARCHAR(100) UNIQUE NOT NULL,
+                       password VARCHAR(255) NOT NULL,
+                       visibility BOOLEAN DEFAULT true,
+                       deleted BOOLEAN DEFAULT false,
+                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE books(
+
+                       id                       SERIAL PRIMARY KEY,
+                       average_rating           NUMERIC(3, 2) DEFAULT 0.0,
+                       best_book_id             BIGINT NOT NULL,
+                       book_id                  BIGINT NOT NULL UNIQUE,
+                       books_count              BIGINT NOT NULL,
+                       description              TEXT,
+                       genres                   TEXT NOT NULL,
+                       goodreads_book_id        BIGINT UNIQUE,
+                       image_url                TEXT NOT NULL DEFAULT 'Add Placeholder.img url',
+                       isbn13                   FLOAT8,
+                       language_code            VARCHAR(30),
+                       pages                    FLOAT8,
+                       publishDate              DATE,
+                       ratings_1                BIGINT,
+                       ratings_2                BIGINT,
+                       ratings_3                BIGINT,
+                       ratings_4                BIGINT,
+                       ratings_5                BIGINT,
+                       ratings_count            BIGINT  DEFAULT 0,
+                       title                    TEXT NOT NULL,
+                       work_id                  BIGINT,
+                       work_ratings_count       BIGINT DEFAULT 0,
+                       work_text_reviews_count  BIGINT DEFAULT 0
+);
+CREATE TABLE authors(
+                       id SERIAL PRIMARY KEY NOT NULL,
+                       name TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE book_authors (
+                              book_id INT REFERENCES books(id) ON DELETE CASCADE,
+                              author_id INT REFERENCES authors(id) ON DELETE CASCADE,
+                              PRIMARY KEY (book_id, author_id)
+);
+
+CREATE INDEX idx_books_title ON books(title);
