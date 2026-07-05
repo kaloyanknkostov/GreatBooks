@@ -13,7 +13,10 @@ public class TestingDbConnection {
         var app = new SpringApplication(ProjectConfig.class);
         app.setWebApplicationType(WebApplicationType.NONE);
         var context = app.run(args);
+        System.out.println("Started with Book Insertion");
         context.getBean(BookInsertion.class).runner();
+        System.out.println("DONE with Book Insertion");
+        context.getBean(SimpleTableInsertion.class).runner();
         context.close();
     }
 

@@ -54,4 +54,11 @@ public class ProjectConfig {
     ) {
         return new BookInsertion(namedParameterJdbcTemplate);
     }
+
+    @Bean
+    public SimpleTableInsertion bookTagInsertion(
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate
+    ) {
+        return new SimpleTableInsertion(namedParameterJdbcTemplate);
+    }
 }
