@@ -61,4 +61,11 @@ public class ProjectConfig {
     ) {
         return new SimpleTableInsertion(namedParameterJdbcTemplate);
     }
+
+    @Bean
+    public UserInsertion userInsertion(
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate
+    ) {
+        return new UserInsertion(namedParameterJdbcTemplate);
+    }
 }

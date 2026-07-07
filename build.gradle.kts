@@ -37,6 +37,7 @@ dependencies {
     testAnnotationProcessor("org.projectlombok:lombok")
     "scriptsImplementation"("org.springframework.boot:spring-boot-starter-jdbc")
     "scriptsImplementation"("com.opencsv:opencsv:5.12.0")
+    "scriptsImplementation"("net.datafaker:datafaker:2.7.0")
     "scriptsRuntimeOnly"("org.postgresql:postgresql")
 }
 

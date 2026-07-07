@@ -16,7 +16,11 @@ public class TestingDbConnection {
         System.out.println("Started with Book Insertion");
         context.getBean(BookInsertion.class).runner();
         System.out.println("DONE with Book Insertion");
+        System.out.println("Started with Simple Insertion");
         context.getBean(SimpleTableInsertion.class).runner();
+        System.out.println("DONE with Simple Insertion");
+        System.out.println("Started with Rating Insertion");
+        context.getBean(UserInsertion.class).runner();
         context.close();
     }
 
