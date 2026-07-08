@@ -4,10 +4,9 @@ import com.example.bookstore.book.model.Book;
 import com.example.bookstore.book.model.Tag;
 import com.example.bookstore.book.proxy.BookImageFetch;
 import com.example.bookstore.book.repository.BookRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 @Service
 public class BookService {
@@ -25,6 +24,7 @@ public class BookService {
        Book temp= new Book(id,title,author,price,tags);
        fetcher.testCalled();
        repo.addBook(temp);
+
     }
 
     public Book findBook(int id ){

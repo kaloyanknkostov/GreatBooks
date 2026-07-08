@@ -35,7 +35,6 @@ public class UserInsertion {
         VALUES (:user_id , :book_id)
         ON CONFLICT DO NOTHING;
         """;
-
     private static final Faker faker = new Faker();
 
     public UserInsertion(NamedParameterJdbcTemplate namedjdbc) {
@@ -50,7 +49,6 @@ public class UserInsertion {
                 System.out.println("Empty file");
                 return;
             }
-
             var batchSize = 50000;
             var batch = new ArrayList<SqlParameterSource>();
             var batchUsers = new ArrayList<SqlParameterSource>();
@@ -113,10 +111,7 @@ public class UserInsertion {
         } catch (FileNotFoundException e) {
             System.out.println("File doesn't exist");
             System.exit(1);
-        } catch (IOException e) {
-            System.out.println("Error");
-            System.exit(1);
-        } catch (CsvValidationException e) {
+        } catch (IOException | CsvValidationException e) {
             System.out.println("Error");
             System.exit(1);
         }
@@ -135,7 +130,7 @@ public class UserInsertion {
     }
 
     private void insertToRead()
-        throws FileNotFoundException, IOException, CsvValidationException {
+        throws IOException, CsvValidationException {
         System.out.println("Started wiht to read");
         try (CSVReader reader = new CSVReader(new FileReader(toReadCSV))) {
             String[] nextRecord;
