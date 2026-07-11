@@ -15,9 +15,5 @@ public class BookStartupTest  implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        System.out.println("=== TESTING SPRING CONTEXT ===");
-        bookService.createBook(1,"Dune", "Frank Herbert", 15.99);
-        Book found = bookService.findBook(0);  // list index 0 for now
-        System.out.println("Found book: " + found.getTitle());
     }
 }

@@ -15,4 +15,5 @@ public class DbConnector {
             "INSERT INTO users (username, email, password) VALUES (?,?,?);";
         jdbc.update(sql, username, email, password);
     }
+
 }

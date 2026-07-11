@@ -172,10 +172,7 @@ import java.time.LocalDate;
         } catch (FileNotFoundException e) {
             System.out.println("File doesn't exist");
             System.exit(1);
-        } catch (IOException e) {
-            System.out.println("Error");
-            System.exit(1);
-        } catch (CsvValidationException e) {
+        } catch (IOException | CsvValidationException e) {
             System.out.println("Error");
             System.exit(1);
         }
@@ -257,9 +254,9 @@ import java.time.LocalDate;
     }
 
     @Transactional
-    private MapSqlParameterSource handleAuthors(int book_id, String authors) {
+    protected MapSqlParameterSource handleAuthors(int book_id, String authors) {
         var authorName = getAuthor(authors);
-        if (authorName.equals("")) {
+        if (authorName.isEmpty()) {
             return null;
         }
         var authorParams = new MapSqlParameterSource().addValue(

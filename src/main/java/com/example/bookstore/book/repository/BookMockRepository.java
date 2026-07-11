@@ -19,7 +19,7 @@ public class BookMockRepository implements BookRepository {
     public Optional<Book> getBook(int id) {
         return list
             .stream()
-            .filter(book -> book.getId() == id)
+            .filter(book -> book.id() == id)
             .findFirst();
     }
 }
