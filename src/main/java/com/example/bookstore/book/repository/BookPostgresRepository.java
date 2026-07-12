@@ -45,4 +45,24 @@ public class BookPostgresRepository  implements BookRepository {
             return Optional.empty();
         }
     }
+
+    @Override
+    public List<Book> getBooks(String query) {
+        var sql = """
+        SELECT books.*, authors.name as author
+        FROM books
+        JOIN book_authors ON books.id = book_authors.book_id
+        JOIN authors ON book_authors.author_id = authors.id
+        WHERE books.title ILIKE ?;
+        """;
+        if (query == null || query.isBlank()) {
+            return new ArrayList<>();
+        }
+        try {
+            return jdbcTemplate.query(sql, new DataClassRowMapper<>(Book.class), "%" + query.trim() + "%");
+        }
+        catch (EmptyResultDataAccessException e){
+            return new ArrayList<Book>() ;
+        }
+    }
 }

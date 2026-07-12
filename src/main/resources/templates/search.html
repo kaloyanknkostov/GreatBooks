@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Search</title>
+    <style>
+        body { margin: 40px; background: white; font-family: serif; color: black; }
+        .search-bar { display: flex; gap: 8px; max-width: 480px; margin-bottom: 24px; }
+        .search-bar input { flex: 1; padding: 8px 10px; font: inherit; border: 1px solid #ccc; }
+        .search-bar button { padding: 8px 12px; font: inherit; border: 1px solid #ccc; background: #f5f5f5; cursor: pointer; }
+        .results { list-style: none; padding: 0; margin: 0; max-width: 480px; }
+        .results li { margin-bottom: 8px; }
+        .results a { color: black; text-decoration: underline; }
+        .empty { color: #666; }
+    </style>
+</head>
+<body>
+    <h1>Search books</h1>
+
+    <form class="search-bar" action="/search" method="get">
+        <input type="text" name="q" placeholder="Search by title…" th:value="${param.q}">
+        <button type="submit" aria-label="Search">&#128269;</button>
+    </form>
+
+    <p class="empty" th:if="${param.q != null and !param.q[0].isBlank() and (books == null or books.isEmpty())}">
+        No books found for "<span th:text="${param.q[0]}"></span>".
+    </p>
+
+    <ol class="results" th:if="${books != null and !books.isEmpty()}">
+        <li th:each="book : ${books}">
+            <a th:href="@{/book/{id}(id=${book.id})}" th:text="${book.title}">Book title</a>
+        </li>
+    </ol>
+</body>
+</html>

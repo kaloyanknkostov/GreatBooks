@@ -9,9 +9,9 @@ public record Book(
         String genres,
         int goodreads_book_id,
         String image_url,
-        float isbn13,
+        Float isbn13,
         String language_code,
-        float pages,
+        Float pages,
         String publishDate,
         int ratings_count
 ) {

@@ -5,6 +5,7 @@ import com.example.bookstore.book.model.Tag;
 import com.example.bookstore.book.proxy.BookImageFetch;
 import com.example.bookstore.book.repository.BookRepository;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,6 +31,9 @@ public class BookService {
 
     public Optional<Book> findBook(int id ){
         return repo.getBook(id);
+    }
+    public List<Book> findBooks( String query){
+        return repo.getBooks(query);
     }
 
 
