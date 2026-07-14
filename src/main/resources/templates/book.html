@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${book.title}">Book</title>
+    <style>
+        body { margin: 40px; background: white; font-family: serif; color: black; }
+        .layout { display: grid; grid-template-columns: 200px 1fr; gap: 24px; max-width: 800px; }
+        img { width: 200px; height: 280px; object-fit: cover; border: 1px solid #ccc; }
+        h1 { margin: 0 0 8px; font-size: 1.5rem; }
+        .label { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <img th:src="${book.bestCoverUrl()}" alt="Book cover">
+
+        <div>
+            <h1 th:text="${book.title}">Title</h1>
+            <p><span class="label">Author:</span> <span th:text="${book.author != null ? book.author : '—'}">—</span></p>
+            <p><span class="label">Description:</span></p>
+            <p th:text="${book.description != null ? book.description : 'No description.'}">Description</p>
+        </div>
+
+        <div>
+            <p><span class="label">Rating:</span> ★★★★★</p>
+            <p><span class="label">Avg rating:</span> <span th:text="${book.average_rating}">0.0</span></p>
+        </div>
+
+        <div>
+            <p><span class="label">Genres:</span> <span th:text="${book.formattedGenres()}">—</span></p>
+        </div>
+    </div>
+</body>
+</html>
