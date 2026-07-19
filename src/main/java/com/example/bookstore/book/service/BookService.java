@@ -5,6 +5,7 @@ import com.example.bookstore.book.model.Tag;
 import com.example.bookstore.book.proxy.BookImageFetch;
 import com.example.bookstore.book.repository.BookRepository;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,11 +23,6 @@ public class BookService {
     }
 
     public void createBook(int id,String title, String author, double price){
-       var tags = new ArrayList<Tag>();
-       //Book temp= new Book(id,title,author,price,tags);
-       fetcher.testCalled();
-       //repo.addBook(temp);
-
     }
 
     public Optional<Book> findBook(int id ){
