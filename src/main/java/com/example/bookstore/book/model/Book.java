@@ -13,13 +13,11 @@ public record Book(
         String language_code,
         Float pages,
         String publishDate,
-        int ratings_count
-) {
+        int ratings_count) {
     public String formattedGenres() {
         if (genres == null || genres.isBlank()) {
             return "—";
         }
-
         return genres.replaceAll("[\\[\\]']", "");
     }
 
@@ -34,10 +32,7 @@ public record Book(
 
         // Goodreads only serves s/m/l sizes; l is the largest available.
         if (image_url.contains("images.gr-assets.com/books/")) {
-            return image_url.replaceFirst(
-                    "(https://images\\.gr-assets\\.com/books/\\d+)[sml](/\\d+\\.jpg)",
-                    "$1l$2"
-            );
+            return image_url.replaceFirst("(https://images\\.gr-assets\\.com/books/\\d+)[sml](/\\d+\\.jpg)", "$1l$2");
         }
 
         return image_url;

@@ -2,6 +2,11 @@ package com.example;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -9,44 +14,35 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.transaction.annotation.Transactional;
 
 public class BookInsertion {
 
     /*
-09/14/08
-for date
-import java.time.LocalDate;
-     import java.time.format.DateTimeFormatter;
-     import java.time.format.DateTimeParseException;
+    09/14/08
+    for date
+    import java.time.LocalDate;
+         import java.time.format.DateTimeFormatter;
+         import java.time.format.DateTimeParseException;
 
-     private static final DateTimeFormatter PUBLISH_DATE =
-         DateTimeFormatter.ofPattern("MM/dd/yy");
+         private static final DateTimeFormatter PUBLISH_DATE =
+             DateTimeFormatter.ofPattern("MM/dd/yy");
 
-     private static LocalDate parsePublishDateOrNull(String raw) {
-         if (raw == null || raw.isBlank()) {
-            return null;
+         private static LocalDate parsePublishDateOrNull(String raw) {
+             if (raw == null || raw.isBlank()) {
+                return null;
+            }
+            try {
+               return LocalDate.parse(raw.trim(), PUBLISH_DATE);
+            } catch (DateTimeParseException e) {
+                return null; // or throw with book_id for debugging
+            }
         }
-        try {
-           return LocalDate.parse(raw.trim(), PUBLISH_DATE);
-        } catch (DateTimeParseException e) {
-            return null; // or throw with book_id for debugging
-        }
-    }
-*/
+    */
     final NamedParameterJdbcTemplate namedjdbc;
-    final File booksCSV = new File(
-        "data/goodbooks-10k-extended/books_enriched.csv"
-    );
-    final File sampleBooksCSV = new File(
-        "data/goodbooks-10k-extended/sample.csv"
-    );
+    final File booksCSV = new File("data/goodbooks-10k-extended/books_enriched.csv");
+    final File sampleBooksCSV = new File("data/goodbooks-10k-extended/sample.csv");
     private static final String sql = """
               INSERT INTO books(
                                  id                       ,
@@ -111,9 +107,7 @@ import java.time.LocalDate;
         ON CONFLICT DO NOTHING;
         """;
 
-    public BookInsertion(
-        NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+    public BookInsertion(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedjdbc = namedParameterJdbcTemplate;
     }
 
@@ -143,28 +137,16 @@ import java.time.LocalDate;
                     batchAuthor.add(author);
                 }
                 if (batch.size() == batchSize) {
-                    namedjdbc.batchUpdate(
-                        sql,
-                        batch.toArray(new SqlParameterSource[0])
-                    );
-                    namedjdbc.batchUpdate(
-                        insertAuthorBook,
-                        batchAuthor.toArray(new SqlParameterSource[0])
-                    );
+                    namedjdbc.batchUpdate(sql, batch.toArray(new SqlParameterSource[0]));
+                    namedjdbc.batchUpdate(insertAuthorBook, batchAuthor.toArray(new SqlParameterSource[0]));
                     batch.clear();
                     batchAuthor.clear();
                 }
                 counter++;
             }
             if (!batch.isEmpty()) {
-                namedjdbc.batchUpdate(
-                    sql,
-                    batch.toArray(new SqlParameterSource[0])
-                );
-                namedjdbc.batchUpdate(
-                    insertAuthorBook,
-                    batchAuthor.toArray(new SqlParameterSource[0])
-                );
+                namedjdbc.batchUpdate(sql, batch.toArray(new SqlParameterSource[0]));
+                namedjdbc.batchUpdate(insertAuthorBook, batchAuthor.toArray(new SqlParameterSource[0]));
                 batch.clear();
                 batchAuthor.clear();
             }
@@ -178,10 +160,7 @@ import java.time.LocalDate;
         }
     }
 
-    private Map<String, String> currentLineToMap(
-        String[] header,
-        String[] line
-    ) {
+    private Map<String, String> currentLineToMap(String[] header, String[] line) {
         var map = new HashMap<String, String>();
         for (int i = 1; i < line.length; i++) {
             map.put(header[i], line[i]);
@@ -193,43 +172,26 @@ import java.time.LocalDate;
         var params = new MapSqlParameterSource();
         for (String header : row.keySet()) {
             switch (header) {
-                //ignore
-                case
-                    "",
-                    "authors_2",
-                    "isbn",
-                    "authors",
-                    "original_publication_year",
-                    "original_title",
-                    "small_image_url" -> {
-                }
+                // ignore
+                case "",
+                        "authors_2",
+                        "isbn",
+                        "authors",
+                        "original_publication_year",
+                        "original_title",
+                        "small_image_url" -> {}
                 // float
-                case "average_rating", "isbn13", "pages" -> params.addValue(
-                    header,
-                    parseFloatsSafe(row.get(header))
-                );
+                case "average_rating", "isbn13", "pages" -> params.addValue(header, parseFloatsSafe(row.get(header)));
                 // raw String
-                case
-                    "description",
-                    "image_url",
-                    "language_code",
-                    "title",
-                    "genres" -> params.addValue(header, row.get(header));
-                //date
+                case "description", "image_url", "language_code", "title", "genres" ->
+                    params.addValue(header, row.get(header));
+                // date
                 case "publishDate" -> {
                     var parsedDate = parseDate(row.get(header));
-                    params.addValue(
-                        header,
-                        parsedDate == null
-                            ? null
-                            : java.sql.Date.valueOf(parsedDate)
-                    );
+                    params.addValue(header, parsedDate == null ? null : java.sql.Date.valueOf(parsedDate));
                 }
                 // int
-                default -> params.addValue(
-                    header,
-                    Integer.parseInt(row.get(header))
-                );
+                default -> params.addValue(header, Integer.parseInt(row.get(header)));
             }
         }
         return params;
@@ -259,21 +221,12 @@ import java.time.LocalDate;
         if (authorName.isEmpty()) {
             return null;
         }
-        var authorParams = new MapSqlParameterSource().addValue(
-            "name",
-            authorName
-        );
-        var authorId = namedjdbc.queryForObject(
-            createAuthorSQL,
-            authorParams,
-            Integer.class
-        );
+        var authorParams = new MapSqlParameterSource().addValue("name", authorName);
+        var authorId = namedjdbc.queryForObject(createAuthorSQL, authorParams, Integer.class);
         if (authorId == null) {
             throw new IllegalStateException("Failed to obtain author ID.");
         }
-        return new MapSqlParameterSource()
-            .addValue("bookId", book_id)
-            .addValue("authorId", authorId);
+        return new MapSqlParameterSource().addValue("bookId", book_id).addValue("authorId", authorId);
     }
 
     private String getAuthor(String authors) {

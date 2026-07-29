@@ -11,9 +11,7 @@ public class DbConnector {
     }
 
     public void tester(String username, String email, String password) {
-        String sql =
-            "INSERT INTO users (username, email, password) VALUES (?,?,?);";
+        String sql = "INSERT INTO users (username, email, password) VALUES (?,?,?);";
         jdbc.update(sql, username, email, password);
     }
-
 }

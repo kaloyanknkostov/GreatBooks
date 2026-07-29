@@ -1,12 +1,13 @@
 package com.example;
 
 import com.zaxxer.hikari.HikariDataSource;
-import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+import javax.sql.DataSource;
 
 @Configuration
 public class ProjectConfig {
@@ -28,6 +29,7 @@ public class ProjectConfig {
         dataSource.setPassword(datasourcePassword);
         dataSource.setMaximumPoolSize(30);
         dataSource.setConnectionTimeout(1000);
+
         return dataSource;
     }
 
@@ -37,9 +39,7 @@ public class ProjectConfig {
     }
 
     @Bean
-    public NamedParameterJdbcTemplate namedParameterJdbcTemplate(
-        DataSource dataSource
-    ) {
+    public NamedParameterJdbcTemplate namedParameterJdbcTemplate(DataSource dataSource) {
         return new NamedParameterJdbcTemplate(dataSource);
     }
 
@@ -49,23 +49,17 @@ public class ProjectConfig {
     }
 
     @Bean
-    public BookInsertion bookInsertion(
-        NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+    public BookInsertion bookInsertion(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         return new BookInsertion(namedParameterJdbcTemplate);
     }
 
     @Bean
-    public SimpleTableInsertion bookTagInsertion(
-        NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+    public SimpleTableInsertion bookTagInsertion(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         return new SimpleTableInsertion(namedParameterJdbcTemplate);
     }
 
     @Bean
-    public UserInsertion userInsertion(
-        NamedParameterJdbcTemplate namedParameterJdbcTemplate
-    ) {
+    public UserInsertion userInsertion(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         return new UserInsertion(namedParameterJdbcTemplate);
     }
 }

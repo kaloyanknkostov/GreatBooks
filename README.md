@@ -94,15 +94,6 @@ Once the app is up, treat it as the environment your recommender lives in.
 
 ---
 
-## Data credits
-
-Book catalog and ratings data are sourced from open datasets on GitHub:
-
-- **[goodbooks-10k](https://github.com/zygmuntz/goodbooks-10k)** — original Goodreads ratings and catalog (~10k books, ~6M ratings) by Zygmunt Zając
-- **[goodbooks-10k-extended](https://github.com/malcolmosh/goodbooks-10k-extended)** — extended book metadata (descriptions, page counts, publication dates, genres) by Malcolm Osh
-
----
-
 ## Contributing
 
 Issues and pull requests are welcome. Prefer small, focused changes that keep the platform useful as a recommender lab: clearer APIs for models, better traffic simulation hooks, or docs that help students get a first recommender online faster.
@@ -112,3 +103,17 @@ Issues and pull requests are welcome. Prefer small, focused changes that keep th
 3. Open a pull request describing what you changed and why
 
 If you are using GoodBooks for a course assignment, feel free to open an issue describing the workflow you need — those shape the platform more than anything else.
+
+## Data Source & Acknowledgements
+
+Book catalog and ratings data are sourced from open datasets on GitHub:
+This project uses the **goodbooks-10k** dataset created by [Zygmunt Zając](https://github.com/zygmuntz/goodbooks-10k).
+
+* **Dataset Source:** [github.com/zygmuntz/goodbooks-10k](https://github.com/zygmuntz/goodbooks-10k)
+* **Dataset License:** [Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/)
+* **[goodbooks-10k-extended](https://github.com/malcolmosh/goodbooks-10k-extended)** — extended book metadata (descriptions, page counts, publication dates, genres) by Malcolm Osh
+---
+
+## License
+
+The code in this repository is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.

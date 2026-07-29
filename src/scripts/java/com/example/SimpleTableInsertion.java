@@ -2,13 +2,14 @@ package com.example;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 public class SimpleTableInsertion {
 
@@ -61,10 +62,7 @@ public class SimpleTableInsertion {
                     var params = new MapSqlParameterSource();
                     var headerCounter = 0;
                     for (String header : headers) {
-                        if (header.equals("tag_name")) params.addValue(
-                            "name",
-                            nextRecord[headerCounter]
-                        );
+                        if (header.equals("tag_name")) params.addValue("name", nextRecord[headerCounter]);
                         /*
                         else if (header.equals("tag_id")) params.addValue(
                             "id",
@@ -72,27 +70,19 @@ public class SimpleTableInsertion {
                         );
                         */
                         else {
-                            params.addValue(
-                                header,
-                                Integer.parseInt(nextRecord[headerCounter])
-                            );
+                            params.addValue(header, Integer.parseInt(nextRecord[headerCounter]));
                         }
                         headerCounter++;
                     }
                     batch.add(params);
                     if (batch.size() == batchSize) {
                         namedjdbc.batchUpdate(
-                            insertQuerySqlList.get(sqlcounter),
-                            batch.toArray(new SqlParameterSource[0])
-                        );
+                                insertQuerySqlList.get(sqlcounter), batch.toArray(new SqlParameterSource[0]));
                         batch.clear();
                     }
                 }
                 if (!batch.isEmpty()) {
-                    namedjdbc.batchUpdate(
-                        insertQuerySqlList.get(sqlcounter),
-                        batch.toArray(new SqlParameterSource[0])
-                    );
+                    namedjdbc.batchUpdate(insertQuerySqlList.get(sqlcounter), batch.toArray(new SqlParameterSource[0]));
                     batch.clear();
                 }
 

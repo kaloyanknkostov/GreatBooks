@@ -1,8 +1,9 @@
 package com.example;
 
-import java.util.Scanner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
+
+import java.util.Scanner;
 
 public class TestingDbConnection {
 
