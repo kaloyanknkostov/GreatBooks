@@ -101,6 +101,10 @@ SPRING_DATASOURCE_PASSWORD=greatbooks \
 ./gradlew runScript
 ```
 
+### Claude Code cloud sessions
+
+`.claude/hooks/session-start.sh` runs at the start of every Claude Code cloud session. It starts a local PostgreSQL with the same `greatbooks` database and credentials as the compose setup, exports the matching `SPRING_DATASOURCE_*` variables, and pre-builds the project, so `./gradlew test` and `./gradlew bootRun` work straight away. It does nothing outside cloud sessions.
+
 ---
 
 ## Usage
