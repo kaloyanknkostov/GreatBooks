@@ -1,0 +1,42 @@
+# Runs GreatBooks with PostgreSQL.
+#   docker compose up --build
+#   podman-compose up --build    (or: podman compose up --build)
+# Override any ${VAR:-default} below in a .env file next to this one.
+
+services:
+  db:
+    image: docker.io/library/postgres:17
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-greatbooks}
+      POSTGRES_USER: ${POSTGRES_USER:-greatbooks}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-greatbooks}
+    ports:
+      # Published so the Gradle seed scripts (./gradlew runScript) can reach it from the host
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  app:
+    build: .
+    image: localhost/greatbooks:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-greatbooks}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-greatbooks}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-greatbooks}
+      JAVA_OPTS: ${JAVA_OPTS:-}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    # Also covers podman-compose versions that ignore the healthcheck condition above
+    restart: unless-stopped
+
+volumes:
+  pgdata:

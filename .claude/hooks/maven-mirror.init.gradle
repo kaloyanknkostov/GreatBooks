@@ -1,0 +1,21 @@
+// Installed into ~/.gradle/init.d/ by session-start.sh in Claude Code cloud sessions only.
+// Maven Central often answers 429 through the cloud egress proxy, so resolve from
+// Google's Maven Central mirror instead. Local builds are unaffected.
+def mirror = 'https://maven-central.storage-download.googleapis.com/maven2/'
+
+beforeSettings { settings ->
+    settings.pluginManagement.repositories {
+        maven { url = mirror }
+        gradlePluginPortal()
+    }
+}
+
+allprojects {
+    def redirect = { repo ->
+        if (repo instanceof MavenArtifactRepository && repo.url.toString().startsWith('https://repo.maven.apache.org/')) {
+            repo.url = mirror
+        }
+    }
+    buildscript.repositories.configureEach(redirect)
+    repositories.configureEach(redirect)
+}

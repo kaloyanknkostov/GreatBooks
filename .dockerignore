@@ -1,0 +1,14 @@
+# Keep the build context small and free of local secrets
+.git
+.gradle
+.idea
+.vscode
+build
+bin
+out
+data
+*.csv
+.env
+**/application-local.properties
+Dockerfile
+compose.yaml

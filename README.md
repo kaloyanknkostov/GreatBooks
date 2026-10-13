@@ -80,6 +80,31 @@ Run the test suite:
 ./gradlew test
 ```
 
+### Run with Docker or Podman
+
+**Requirements:** Docker with Compose, or Podman with `podman-compose`. No local JDK or PostgreSQL needed.
+
+```bash
+docker compose up --build        # or: podman-compose up --build
+```
+
+This builds the app image, starts PostgreSQL 17, waits for it to be healthy, and starts the app on http://localhost:8080. Flyway creates the schema on first start. Database data lives in the `pgdata` volume, so it survives restarts; `docker compose down -v` (or `podman-compose down -v`) wipes it.
+
+Defaults (database `greatbooks`, user `greatbooks`, password `greatbooks`, app port 8080, DB port 5432) can be changed by copying `.env.example` to `.env` and editing it.
+
+The database port is published on the host, so the seed scripts can load the goodbooks-10k CSVs into the containerized database (the default `runScript` class loads books, tags and ratings from `data/goodbooks-10k-extended/`):
+
+```bash
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/greatbooks \
+SPRING_DATASOURCE_USERNAME=greatbooks \
+SPRING_DATASOURCE_PASSWORD=greatbooks \
+./gradlew runScript
+```
+
+### Claude Code cloud sessions
+
+`.claude/hooks/session-start.sh` runs at the start of every Claude Code cloud session. It starts a local PostgreSQL with the same `greatbooks` database and credentials as the compose setup, exports the matching `SPRING_DATASOURCE_*` variables, and pre-builds the project, so `./gradlew test` and `./gradlew bootRun` work straight away. It does nothing outside cloud sessions.
+
 ---
 
 ## Usage
